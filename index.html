@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login System</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0;
+        }
+        .login-box { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.2); 
+            width: 400px; 
+            text-align: center;
+        }
+        .logo {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 2px solid #e1e5e9; 
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        #message { 
+            margin-top: 15px; 
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <div class="logo">🔐 Login</div>
+    <h2>Resume Parser AI</h2>
+    <p style="color: #666; margin-bottom: 30px;">Please login to your account</p>
+    
+    <input type="email" id="email" placeholder="Email Address">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div style="margin-top:10px;">
+        <a href="#" onclick="openResetModal()" style="color:#667eea;text-decoration:none;">Forgot password?</a>
+    </div>
+    
+    <div id="message"></div>
+    <div class="loading" id="loading">Signing in...</div>
+</div>
+
+<!-- Password Reset Modal
+<div id="resetModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
+  <div style="background:#fff; max-width:420px; margin:5% auto; border-radius:10px; padding:20px; position:relative;">
+    <span style="position:absolute; right:12px; top:8px; cursor:pointer; font-size:20px;" onclick="closeResetModal()">&times;</span>
+    <h3 style="margin-bottom:10px;">Reset Password</h3>
+    <div style="font-size:14px; color:#666; margin-bottom:10px;">Enter your email and new password. You will receive a confirmation link/token that expires in 1 minute.</div>
+    <input type="email" id="resetEmail" placeholder="Email Address" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+    <input type="password" id="resetNewPassword" placeholder="New Password (min 6 chars)" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+    <input type="password" id="resetConfirmPassword" placeholder="Confirm New Password" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+    <button onclick="requestReset()" style="width:100%; padding:12px; border:none; background:#667eea; color:#fff; border-radius:8px; cursor:pointer;">Send Reset</button>
+    <div id="resetMsg" style="margin-top:10px; font-size:14px;"></div>
+    <hr style="margin:16px 0;"/>
+    <div style="font-size:14px; color:#666;">Have a token? Paste it to confirm:</div>
+    <input type="text" id="resetToken" placeholder="Paste token" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+    <button onclick="confirmReset()" style="width:100%; padding:12px; border:none; background:#28a745; color:#fff; border-radius:8px; cursor:pointer;">Confirm Reset</button>
+  </div>
+</div> -->
+<!-- Password Reset Modal -->
+<div id="resetModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
+    <div style="background:#fff; max-width:420px; margin:5% auto; border-radius:10px; padding:20px; position:relative;">
+      <span style="position:absolute; right:12px; top:8px; cursor:pointer; font-size:20px;" onclick="closeResetModal()">&times;</span>
+      <h3 style="margin-bottom:10px;">Reset Password</h3>
+      <div style="font-size:14px; color:#666; margin-bottom:10px;">Enter your email and new password. You will receive a confirmation link that expires in 1 minute.</div>
+      <input type="email" id="resetEmail" placeholder="Email Address" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+      <input type="password" id="resetNewPassword" placeholder="New Password (min 6 chars)" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+      <input type="password" id="resetConfirmPassword" placeholder="Confirm New Password" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px;" />
+      <button onclick="requestReset()" style="width:100%; padding:12px; border:none; background:#667eea; color:#fff; border-radius:8px; cursor:pointer;">Send Reset Link</button>
+      <div id="resetMsg" style="margin-top:10px; font-size:14px;"></div>
+    </div>
+</div>
+
+<script>
+async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const messageDiv = document.getElementById("message");
+    const loadingDiv = document.getElementById("loading");
+
+    if (!email || !password) {
+        showMessage("Please fill in all fields", "error");
+        return;
+    }
+
+    loadingDiv.style.display = "block";
+    messageDiv.style.display = "none";
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Store all user data with consistent field names
+            const userData = {
+                token: data.token,
+                role: data.role,
+                user_id: data.user_id || data.id, // Handle both field names
+                email: data.email,
+                company_id: data.company_id || "",
+                name: data.name || ""
+            };
+            
+            localStorage.setItem("userData", JSON.stringify(userData));
+            localStorage.setItem("userToken", data.token);
+            localStorage.setItem("userRole", data.role);
+            localStorage.setItem("userId", data.user_id || data.id); // Ensure user_id is stored
+            localStorage.setItem("companyId", data.company_id || "");
+            
+            showMessage("Login successful! Redirecting...", "success");
+            
+            setTimeout(() => {
+                switch(data.role) {
+                    case "super_admin":
+                        window.location.href = "super-admin-dashboard.html";
+                        break;
+                    case "company_admin":
+                        window.location.href = "company-dashboard.html";
+                        break;
+                    case "user":
+                        window.location.href = "user-dashboard.html";
+                        break;
+                    default:
+                        window.location.href = "dashboard.html";
+                }
+            }, 1500);
+        } else {
+            showMessage(data.detail || "Login failed", "error");
+        }
+    } catch (error) {
+        showMessage("Network error. Please try again.", "error");
+    } finally {
+        loadingDiv.style.display = "none";
+    }
+}
+
+function showMessage(message, type) {
+    const messageDiv = document.getElementById("message");
+    messageDiv.innerText = message;
+    messageDiv.className = type;
+    messageDiv.style.display = "block";
+}
+
+// Allow Enter key to submit
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        login();
+    }
+});
+
+// function openResetModal(){
+//   document.getElementById('resetModal').style.display='block';
+// }
+// function closeResetModal(){
+//   document.getElementById('resetModal').style.display='none';
+//   document.getElementById('resetMsg').innerText='';
+// }
+
+// async function requestReset(){
+//   const email = (document.getElementById('resetEmail').value||'').trim();
+//   const pw = (document.getElementById('resetNewPassword').value||'').trim();
+//   const cpw = (document.getElementById('resetConfirmPassword').value||'').trim();
+//   const msg = document.getElementById('resetMsg');
+//   msg.style.color = '#721c24';
+//   msg.innerText = '';
+//   if(!email||!pw||!cpw){ msg.innerText = 'All fields are required.'; return; }
+//   if(pw.length<6){ msg.innerText = 'Password must be at least 6 characters.'; return; }
+//   if(pw!==cpw){ msg.innerText = 'Passwords do not match.'; return; }
+//   try{
+//     const res = await fetch('http://127.0.0.1:8000/password-reset/request',{
+//       method:'POST', headers:{'Content-Type':'application/json'},
+//       body: JSON.stringify({ email: email, new_password: pw })
+//     });
+//     const txt = await res.text();
+//     msg.style.color = res.ok? '#155724':'#721c24';
+//     msg.innerText = res.ok? 'Reset email sent. Check your inbox. (For dev, see console for token)':'Failed: '+txt;
+//   }catch(e){ msg.innerText = 'Network error.'; }
+// }
+function openResetModal(){
+  document.getElementById('resetModal').style.display='block';
+  // Clear previous inputs and messages
+  document.getElementById('resetEmail').value = '';
+  document.getElementById('resetNewPassword').value = '';
+  document.getElementById('resetConfirmPassword').value = '';
+  document.getElementById('resetMsg').innerText = '';
+}
+
+function closeResetModal(){
+  document.getElementById('resetModal').style.display='none';
+}
+
+async function requestReset(){
+  const email = (document.getElementById('resetEmail').value||'').trim();
+  const pw = (document.getElementById('resetNewPassword').value||'').trim();
+  const cpw = (document.getElementById('resetConfirmPassword').value||'').trim();
+  const msg = document.getElementById('resetMsg');
+  msg.style.color = '#721c24';
+  msg.innerText = '';
+  
+  if(!email||!pw||!cpw){ 
+    msg.innerText = 'All fields are required.'; 
+    return; 
+  }
+  if(pw.length<6){ 
+    msg.innerText = 'Password must be at least 6 characters.'; 
+    return; 
+  }
+  if(pw!==cpw){ 
+    msg.innerText = 'Passwords do not match.'; 
+    return; 
+  }
+  
+  try {
+    const res = await fetch('http://127.0.0.1:8000/password-reset/request', {
+      method: 'POST', 
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email: email, new_password: pw })
+    });
+    
+    if (res.ok) {
+      // Show success message and close modal after delay
+      msg.style.color = '#155724';
+      msg.innerText = 'Password reset link sent to your email!';
+      
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        closeResetModal();
+      }, 2000);
+    } else {
+      const error = await res.text();
+      msg.style.color = '#721c24';
+      msg.innerText = 'Failed: ' + error;
+    }
+  } catch(e) { 
+    msg.innerText = 'Network error: ' + e.message; 
+  }
+}
+async function confirmReset(){
+  const token = (document.getElementById('resetToken').value||'').trim();
+  const msg = document.getElementById('resetMsg');
+  msg.style.color = '#721c24';
+  msg.innerText = '';
+  if(!token){ msg.innerText = 'Token is required.'; return; }
+  try{
+    const res = await fetch(`http://127.0.0.1:8000/password-reset/confirm/${token}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token: token })
+    });
+    const txt = await res.text();
+    msg.style.color = res.ok? '#155724':'#721c24';
+    msg.innerText = res.ok? 'Password reset successful. You can log in now.':'Failed: '+txt;
+  }catch(e){ msg.innerText = 'Network error.'; }
+}
+</script>
+
+</body>
+</html>

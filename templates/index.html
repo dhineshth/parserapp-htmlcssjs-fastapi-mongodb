@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TalentHive Resume Analyzer</title>
+  <link rel="stylesheet" href="/static/ui.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="/static/logo.png" alt="Logo" class="logo" />
+      <div>
+        <h1>TalentHive Resume Analyzer</h1>
+        <p class="subheader">AI-powered resume analysis for better hiring decisions</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="analyzer">📄 Resume Analyzer</button>
+      <button class="tab" data-tab="history">📚 Analysis History</button>
+    </div>
+
+    <div id="tab-analyzer" class="tab-content active">
+      <div class="grid">
+        <div class="card">
+          <div class="drag-drop">📤 Upload Resume</div>
+          <input type="file" id="resume" accept=".pdf,.doc,.docx" />
+          <div class="hint">Supported: PDF, DOC, DOCX</div>
+        </div>
+
+        <div class="card">
+          <div class="job-title">🎯 Job Description</div>
+          <div class="row">
+            <label>Client Source</label>
+            <div class="radio-group">
+              <label><input type="radio" name="client_mode" value="new" checked /> New Client</label>
+              <label><input type="radio" name="client_mode" value="existing" /> Existing Client</label>
+            </div>
+          </div>
+
+          <div id="existing-client" class="section hidden">
+            <div class="row">
+              <label>Select Client</label>
+              <select id="existing_client_select"><option>Loading...</option></select>
+            </div>
+            <div class="row">
+              <label>Select Job Description Name</label>
+              <select id="jd_select"><option>Choose One</option></select>
+            </div>
+            <div id="jd_details" class="jd-details hidden">
+              <div class="jd-controls">
+                <button id="jd_edit_btn" class="secondary">✏️ Edit</button>
+                <button id="jd_save_btn" class="primary hidden">Save</button>
+                <button id="jd_cancel_btn" class="secondary hidden">Cancel</button>
+              </div>
+              <div class="row"><label>Required Experience</label><input id="jd_req_exp" disabled /></div>
+              <div class="row"><label>Primary Skills</label><textarea id="jd_primary" disabled></textarea></div>
+              <div class="row"><label>Secondary Skills</label><textarea id="jd_secondary" disabled></textarea></div>
+            </div>
+          </div>
+
+          <div id="new-client" class="section">
+            <div class="row required"><label>Client Name</label><input type="text" id="client_name" placeholder="Zoho" /></div>
+            <div class="row required"><label>Job Description Name</label><input type="text" id="jd_title" placeholder="Senior Python Developer" /></div>
+            <div class="row required"><label>Required Experience</label><input type="text" id="required_experience" placeholder="e.g., 3-5, 4+, 5 +" /></div>
+            <div class="row required"><label>Primary Skills (Must Have)</label><textarea id="primary_skills" placeholder="Python, Java, SQL"></textarea></div>
+            <div class="row"><label>Secondary Skills (Nice to Have)</label><textarea id="secondary_skills" placeholder="Docker, AWS, CI/CD"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="center">
+        <button id="analyze_btn" class="primary">✨ Analyze Resume</button>
+      </div>
+
+      <div id="analysis_container" class="analysis hidden"></div>
+    </div>
+
+    <div id="tab-history" class="tab-content">
+      <div class="row search-row">
+        <label>Search</label>
+        <input type="text" id="history_search" placeholder="Type name, email, client or JD..." />
+      </div>
+      <div id="history_table" class="table"></div>
+    </div>
+  </div>
+
+  <script src="/static/ui.js"></script>
+</body>
+<!-- This is a minimal UI; your Streamlit app remains available separately. -->
+</html>
+

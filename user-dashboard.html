@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - Resume Analyzer</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --secondary-color: #20c997;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #sidebar .sidebar-header {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        #sidebar .sidebar-header img {
+            height: 40px;
+            margin-bottom: 10px;
+        }
+        
+        #sidebar .sidebar-header h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        
+        #sidebar .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        #sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        #sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        #sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        #sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        #sidebar .nav-link .link-text {
+            transition: opacity 0.3s;
+        }
+        
+        /* Main Content Styles */
+        #content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+        
+        .card-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .card-success {
+            background: linear-gradient(135deg, #2bde8c 0%, #1eae6e 100%);
+            color: white;
+        }
+        
+        .card-warning {
+            background: linear-gradient(135deg, #ffb347 0%, #ff8c00 100%);
+            color: white;
+        }
+        
+        .card-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Data Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            padding: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table tr:hover td {
+            background-color: #f8f9fa;
+        }
+        
+        /* Resume Analyzer Styles */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0 20px;
+        }
+        
+        .tab {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: #e0f2fe;
+            border-color: #93c5fd;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .drag-drop {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .job-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .row {
+            display: flex;
+            flex-direction: column;
+            margin: 12px 0;
+        }
+        
+        .row label {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .jd-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        #jd_req_exp {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+        }
+        
+        input[type=text], input[type=file], textarea, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .required label:after {
+            content: ' *';
+            color: #ef4444;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .center {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+        }
+        
+        .primary {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+        
+        .secondary {
+            background: #e5e7eb;
+            color: #111827;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+        
+        .primary:hover {
+            background: #2563eb;
+        }
+        
+        .jd-details.hidden, .section.hidden, .analysis.hidden {
+            display: none;
+        }
+        
+        .jd-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .analysis {
+            margin-top: 16px;
+        }
+        
+        .table {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: auto;
+        }
+        
+        .table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            border-bottom: 1px solid #eee;
+            padding: 8px 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        
+        .search-row {
+            max-width: 420px;
+        }
+        
+        /* Analysis Results Styling */
+        .analysis-card {
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .candidate-name {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .match-score-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-circle-inner {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-score {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .profile-feedback {
+            margin-bottom: 20px;
+        }
+        
+        .panel {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .metric-card {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: #28a745;
+        }
+        
+        .error {
+            color: #dc3545;
+        }
+        
+        .no-match {
+            background: #fff5f5;
+        }
+        
+        .skill-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .skill-box {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .skill-box h5 {
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .skill-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+        }
+        
+        .skill-matched {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .skill-missing-primary {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .skill-missing-secondary {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .spinner {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2rem;
+        }
+        
+        /* Upload Area Styling */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: #f9fafb;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .upload-area.drag-over {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+        
+        /* Form Layout Improvements */
+        .form-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-section-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #374151;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            #sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            #sidebar .link-text {
+                opacity: 0;
+                display: none;
+            }
+            
+            #sidebar .sidebar-header h3 {
+                display: none;
+            }
+            
+            #sidebar .sidebar-header img {
+                margin-bottom: 0;
+            }
+            
+            #content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+            
+            .skill-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            #content {
+                margin-left: 0;
+            }
+            
+            .top-navbar {
+                padding: 0.5rem;
+            }
+            
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* Stats Cards Layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* File Validation Error */
+        .file-error {
+            color: #dc3545;
+            margin-top: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        /* Loading Indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <img src="logo3.png" alt="Logo" style="width: 70px; height: 70px;">
+            <h3>Company Admin</h3>
+        </div>
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-link="dashboard" onclick="showDashboard()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-link="resume-analyzer" onclick="showResumeAnalyzer()">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="link-text">Resume Analyzer</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-link="analysis-history" onclick="showAnalysisHistory()">
+                        <i class="fas fa-history"></i>
+                        <span class="link-text">Analysis History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-link="users" onclick="loadCompanyUsers()">
+                        <i class="fas fa-users"></i>
+                        <span class="link-text">Company Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-link="info" onclick="showCompanyInfo()">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="link-text">Company Info</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar navbar navbar-expand navbar-light bg-white">
+            <div class="container-fluid">
+                <button class="btn btn-link d-md-none" type="button" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="user-info">
+                        <div class="avatar" id="userInitial">A</div>
+                        <div>
+                            <div class="fw-bold" id="userName">Admin</div>
+                            <small class="text-muted">Company Admin</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <div class="container-fluid py-4">
+            <!-- Welcome Section -->
+            <!-- <div class="row mb-4 animate-fade">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body text-center py-4">
+                            <h2 class="card-title text-primary">Company Admin Dashboard</h2>
+                            <p class="card-text text-muted">Manage your company's users and operations</p>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Stats Cards -->
+            <div class="row mb-4 animate-fade">
+                <div class="col-12">
+                    <div class="stats-grid">
+                        <div class="stats-card">
+                            <div class="stats-number text-primary" id="usersCount">0</div>
+                            <div class="stats-label">Company Users</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-number text-info" id="adminsCount">0</div>
+                            <div class="stats-label">Company Admins</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-number text-success" id="analysesCount">0</div>
+                            <div class="stats-label">Resume Analyses</div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-number text-warning" id="clientsCount">0</div>
+                            <div class="stats-label">Clients</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Section -->
+            <div class="row animate-fade">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0" id="dataSectionTitle">Company Data</h5>
+                                <div class="dropdown" id="dataFilterDropdownContainer">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dataFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-filter"></i> Options
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dataFilterDropdown">
+                                        <li><a class="dropdown-item" href="#" onclick="loadCompanyUsers()">View Users</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="showCompanyInfo()">Company Info</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="showResumeAnalyzer()">Resume Analyzer</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="showAnalysisHistory()">Analysis History</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="dataContent">
+                                <p class="text-muted text-center py-4">Select an option from the sidebar or quick actions to view data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
+        const ALLOWED_FILE_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        
+        let userData = null;
+        let companyData = null;
+        let analysisHistory = [];
+
+        // Check authentication on page load
+        window.onload = function() {
+            const storedUserData = localStorage.getItem("userData");
+            if (!storedUserData) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            userData = JSON.parse(storedUserData);
+            if (userData.role !== "user") {
+                window.location.href = "index.html";
+                return;
+            }
+
+            document.getElementById("userName").textContent = userData.name;
+            document.getElementById("userInitial").textContent = userData.name.charAt(0).toUpperCase();
+            
+            loadCompanyData();
+            loadCompanyUsers();
+            loadAnalysisHistory();
+            setActiveLink('dashboard');
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            if (sidebar.style.width === '0px' || sidebar.style.width === '') {
+                sidebar.style.width = 'var(--sidebar-width)';
+                content.style.marginLeft = 'var(--sidebar-width)';
+            } else {
+                sidebar.style.width = '0';
+                content.style.marginLeft = '0';
+            }
+        }
+
+        function setActiveLink(linkId) {
+            // Remove active class from all links
+            document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Add active class to the clicked link
+            if (linkId) {
+                const activeLink = document.querySelector(`#sidebar .nav-link[data-link="${linkId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+            
+            // Store the active link in localStorage
+            localStorage.setItem('activeLink', linkId || 'dashboard');
+        }
+
+        function showDashboard() {
+            setActiveLink('dashboard');
+            document.getElementById('dataSectionTitle').textContent = 'Company Data';
+            document.getElementById('dataFilterDropdownContainer').style.display = 'block';
+            document.getElementById('dataContent').innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-tachometer-alt fa-3x text-muted mb-3"></i>
+                    <h5>Dashboard Overview</h5>
+                    <p class="text-muted">Select an option from the sidebar to view company data</p>
+                </div>
+            `;
+        }
+
+        function showResumeAnalyzer() {
+            setActiveLink('resume-analyzer');
+            document.getElementById('dataSectionTitle').textContent = 'Resume Analyzer';
+            document.getElementById('dataFilterDropdownContainer').style.display = 'none';
+            
+            document.getElementById('dataContent').innerHTML = `
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-file-upload me-2"></i>Upload Resume
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="drag-drop">Drag & drop your file here or click to browse</div>
+                        <div class="hint">Supported formats: PDF, DOC, DOCX (Max: 3MB)</div>
+                        <input type="file" id="resume" accept=".pdf,.doc,.docx" style="display: none;" />
+                    </div>
+                    <div id="file-name" class="text-center mb-3"></div>
+                    <div id="file-error" class="file-error"></div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-briefcase me-2"></i>Job Description Details
+                    </div>
+                    
+                    <div class="row">
+                        <label>Client Source</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="client_mode" value="new" checked onchange="toggleClientMode()" /> New Client</label>
+                            <label><input type="radio" name="client_mode" value="existing" onchange="toggleClientMode()" /> Existing Client</label>
+                        </div>
+                    </div>
+
+                    <div id="existing-client" class="section hidden">
+                        <div class="row required">
+                            <label>Select Client</label>
+                            <select id="existing_client_select" onchange="loadClientJDs()">
+                                <option value="">Loading clients...</option>
+                            </select>
+                        </div>
+                        <div class="row required" id="jd_select_row" style="display: none;">
+                            <label>Select Job Description</label>
+                            <select id="jd_select" onchange="loadJDDetails()" disabled>
+                                <option value="">Select a client first</option>
+                            </select>
+                        </div>
+                        <div id="jd_details" class="jd-details hidden">
+                            
+                            <div class="row required">
+                                <label>Required Experience</label>
+                                <input id="jd_req_exp" type="text" disabled />
+                            </div>
+                            <div class="row required">
+                                <label>Primary Skills</label>
+                                <textarea id="jd_primary" disabled></textarea>
+                            </div>
+                            <div class="row">
+                                <label>Secondary Skills</label>
+                                <textarea id="jd_secondary" disabled></textarea>
+                            </div>
+                            <div class="jd-controls">
+                                <button id="jd_edit_btn" class="secondary" onclick="enableJDEditing()">✏️ Edit</button>
+                                <button id="jd_save_btn" class="primary hidden" onclick="saveJDChanges()">Save</button>
+                                <button id="jd_cancel_btn" class="secondary hidden" onclick="cancelJDEditing()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="new-client" class="section">
+                        <div class="row required"><label>Client Name</label><input type="text" id="client_name" placeholder="Zoho" /></div>
+                        <div class="row required"><label>Job Description Name</label><input type="text" id="jd_title" placeholder="Senior Python Developer" /></div>
+                        <div class="row required"><label>Required Experience</label><input type="text" id="required_experience" placeholder="e.g., 3-5, 4+, 5 +" /></div>
+                        <div class="row required"><label>Primary Skills (Must Have)</label><textarea id="primary_skills" placeholder="Python, Java, SQL"></textarea></div>
+                        <div class="row"><label>Secondary Skills (Nice to Have)</label><textarea id="secondary_skills" placeholder="Docker, AWS, CI/CD"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="center">
+                    <button id="analyze_btn" class="primary" onclick="analyzeResume()">
+                        <i class="fas fa-magic me-2"></i> Analyze Resume
+                    </button>
+                </div>
+
+                <div class="loading" id="analyzeLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing resume, please wait...</p>
+                </div>
+
+                <div id="analysis_container" class="analysis hidden"></div>
+            `;
+            
+            // Initialize the resume analyzer components
+            setTimeout(() => {
+                initDragAndDrop();
+                initFileUpload();
+                loadClients();
+            }, 100);
+        }
+       
+        // Store original values for cancel functionality
+        let originalJDValues = {};
+
+        function enableJDEditing() {
+            const jdReqExp = document.getElementById('jd_req_exp');
+            const jdPrimary = document.getElementById('jd_primary');
+            const jdSecondary = document.getElementById('jd_secondary');
+            const jdEditBtn = document.getElementById('jd_edit_btn');
+            const jdSaveBtn = document.getElementById('jd_save_btn');
+            const jdCancelBtn = document.getElementById('jd_cancel_btn');
+            const analyzeBtn = document.getElementById('analyze_btn');
+            
+            // Store original values
+            originalJDValues = {
+                req_exp: jdReqExp.value,
+                primary: jdPrimary.value,
+                secondary: jdSecondary.value
+            };
+            
+            // Enable editing
+            jdReqExp.disabled = false;
+            jdPrimary.disabled = false;
+            jdSecondary.disabled = false;
+            
+            // Toggle button visibility
+            jdEditBtn.classList.add('hidden');
+            jdSaveBtn.classList.remove('hidden');
+            jdCancelBtn.classList.remove('hidden');
+            
+            // Hide analyze button during editing
+            analyzeBtn.style.display = 'none';
+        }
+
+        function cancelJDEditing() {
+            const jdReqExp = document.getElementById('jd_req_exp');
+            const jdPrimary = document.getElementById('jd_primary');
+            const jdSecondary = document.getElementById('jd_secondary');
+            const jdEditBtn = document.getElementById('jd_edit_btn');
+            const jdSaveBtn = document.getElementById('jd_save_btn');
+            const jdCancelBtn = document.getElementById('jd_cancel_btn');
+            const analyzeBtn = document.getElementById('analyze_btn');
+            
+            // Restore original values
+            jdReqExp.value = originalJDValues.req_exp;
+            jdPrimary.value = originalJDValues.primary;
+            jdSecondary.value = originalJDValues.secondary;
+            
+            // Disable editing
+            jdReqExp.disabled = true;
+            jdPrimary.disabled = true;
+            jdSecondary.disabled = true;
+            
+            // Toggle button visibility
+            jdEditBtn.classList.remove('hidden');
+            jdSaveBtn.classList.add('hidden');
+            jdCancelBtn.classList.add('hidden');
+            
+            // Show analyze button again
+            analyzeBtn.style.display = 'block';
+        }
+
+        async function saveJDChanges() {
+            const clientSelect = document.getElementById('existing_client_select');
+            const jdSelect = document.getElementById('jd_select');
+            const jdReqExp = document.getElementById('jd_req_exp');
+            const jdPrimary = document.getElementById('jd_primary');
+            const jdSecondary = document.getElementById('jd_secondary');
+            const jdEditBtn = document.getElementById('jd_edit_btn');
+            const jdSaveBtn = document.getElementById('jd_save_btn');
+            const jdCancelBtn = document.getElementById('jd_cancel_btn');
+            const analyzeBtn = document.getElementById('analyze_btn');
+            
+            const clientName = clientSelect.value;
+            const jdName = jdSelect.value;
+            
+            if (!clientName || !jdName) {
+                alert('Please select both a client and a job description.');
+                return;
+            }
+            
+            // Validate experience format
+            if (!/^\d+\s*\+|\d+\s*-\s*\d+$/.test(jdReqExp.value.trim())) {
+                alert("Invalid experience format! Use '3-5', '4+' or '5 +'");
+                return;
+            }
+            
+            const body = {
+                required_experience: jdReqExp.value.trim(),
+                primary_skills: jdPrimary.value.split(',').map(s => s.trim()).filter(Boolean),
+                secondary_skills: jdSecondary.value.split(',').map(s => s.trim()).filter(Boolean)
+            };
+            
+            try {
+                const res = await authFetch(`${API_BASE_URL}/clients/${encodeURIComponent(clientName)}/jds/${encodeURIComponent(jdName)}`, {
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(body)
+                });
+                
+                if (res.ok) {
+                    alert('Job description updated successfully!');
+                    
+                    // Disable editing after save
+                    jdReqExp.disabled = true;
+                    jdPrimary.disabled = true;
+                    jdSecondary.disabled = true;
+                    
+                    // Toggle button visibility
+                    jdEditBtn.classList.remove('hidden');
+                    jdSaveBtn.classList.add('hidden');
+                    jdCancelBtn.classList.add('hidden');
+                    
+                    // Show analyze button again
+                    analyzeBtn.style.display = 'block';
+                } else {
+                    const error = await res.json();
+                    alert(`Failed to update job description: ${error.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error updating JD:', error);
+                alert('Error updating job description. Please try again.');
+            }
+        }
+
+        function showAnalysisHistory() {
+            setActiveLink('analysis-history');
+            document.getElementById('dataSectionTitle').textContent = 'Analysis History';
+            document.getElementById('dataFilterDropdownContainer').style.display = 'none';
+            
+            document.getElementById('dataContent').innerHTML = `
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-history me-2"></i>Analysis History
+                    </div>
+                    
+                    <div class="row search-row">
+                        <label>Search</label>
+                        <input type="text" id="history_search" placeholder="Type name, email, client or JD..." oninput="filterHistory()" />
+                    </div>
+                    
+                    <div id="history_table" class="table"></div>
+                </div>
+            `;
+            
+            // Load history data
+            loadHistory();
+        }
+
+        function initDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('resume');
+            const fileError = document.getElementById('file-error');
+            
+            if (!uploadArea || !fileInput) return;
+            
+            // Click to select files
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            // Handle dropped files
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight() {
+                uploadArea.classList.add('drag-over');
+            }
+            
+            function unhighlight() {
+                uploadArea.classList.remove('drag-over');
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    handleFiles(files);
+                }
+            }
+            
+            function handleFiles(files) {
+                const file = files[0];
+                
+                // Validate file
+                const validationResult = validateFile(file);
+                if (!validationResult.isValid) {
+                    fileError.textContent = validationResult.message;
+                    fileError.style.display = 'block';
+                    return;
+                }
+                
+                // Hide any previous error
+                fileError.style.display = 'none';
+                
+                // Update file input and display file name
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                document.getElementById('file-name').textContent = `Selected file: ${file.name}`;
+            }
+            
+            function validateFile(file) {
+                // Check if file is provided
+                if (!file) {
+                    return { isValid: false, message: 'Please select a file.' };
+                }
+                
+                // Check file type
+                if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+                    return { isValid: false, message: 'Invalid file type. Please upload a PDF, DOC, or DOCX file.' };
+                }
+                
+                // Check file size
+                if (file.size > MAX_FILE_SIZE) {
+                    return { isValid: false, message: 'File size exceeds the 3MB limit.' };
+                }
+                
+                return { isValid: true, message: '' };
+            }
+        }
+
+        function initFileUpload() {
+            const fileInput = document.getElementById('resume');
+            const fileName = document.getElementById('file-name');
+            const fileError = document.getElementById('file-error');
+            
+            if (!fileInput) return;
+            
+            fileInput.addEventListener('change', function() {
+                // Hide any previous error
+                fileError.style.display = 'none';
+                
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    
+                    // Validate file
+                    const validationResult = validateFile(file);
+                    if (!validationResult.isValid) {
+                        fileError.textContent = validationResult.message;
+                        fileError.style.display = 'block';
+                        fileName.textContent = '';
+                        return;
+                    }
+                    
+                    fileName.textContent = `Selected file: ${file.name}`;
+                } else {
+                    fileName.textContent = '';
+                }
+            });
+        }
+        
+        function validateFile(file) {
+            // Check if file is provided
+            if (!file) {
+                return { isValid: false, message: 'Please select a file.' };
+            }
+            
+            // Check file type
+            if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+                return { isValid: false, message: 'Invalid file type. Please upload a PDF, DOC, or DOCX file.' };
+            }
+            
+            // Check file size
+            if (file.size > MAX_FILE_SIZE) {
+                return { isValid: false, message: 'File size exceeds the 3MB limit.' };
+            }
+            
+            return { isValid: true, message: '' };
+        }
+
+        function toggleClientMode() {
+            const usingExisting = document.querySelector('input[name="client_mode"][value="existing"]').checked;
+            document.getElementById('existing-client').classList.toggle('hidden', !usingExisting);
+            document.getElementById('new-client').classList.toggle('hidden', usingExisting);
+        }
+
+        async function loadClients() {
+            const clientSelect = document.getElementById('existing_client_select');
+            const jdSelectRow = document.getElementById('jd_select_row');
+            
+            if (!clientSelect) return;
+            
+            try {
+                const res = await authFetch(`${API_BASE_URL}/clients`);
+                const clients = await res.json();
+                
+                clientSelect.innerHTML = '<option value="">Choose a Client</option>';
+                clients.forEach(client => {
+                    clientSelect.innerHTML += `<option value="${client}">${client}</option>`;
+                });
+                
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                clientSelect.innerHTML = '<option value="">Error loading clients</option>';
+            }
+        }
+
+        async function loadClientJDs() {
+            const clientSelect = document.getElementById('existing_client_select');
+            const jdSelect = document.getElementById('jd_select');
+            const jdSelectRow = document.getElementById('jd_select_row');
+            const jdDetails = document.getElementById('jd_details');
+            
+            const clientName = clientSelect.value;
+            
+            // Hide JD selection if no client is selected
+            if (!clientName) {
+                jdSelectRow.style.display = 'none';
+                jdDetails.classList.add('hidden');
+                return;
+            }
+            
+            // Show JD selection row
+            jdSelectRow.style.display = 'flex';
+            jdSelect.innerHTML = '<option value="">Loading job descriptions...</option>';
+            jdSelect.disabled = true;
+            
+            try {
+                const res = await authFetch(`${API_BASE_URL}/clients/${encodeURIComponent(clientName)}/jds`);
+                const jds = await res.json();
+                
+                jdSelect.innerHTML = '<option value="">Choose a Job Description</option>';
+                jds.forEach(jd => {
+                    jdSelect.innerHTML += `<option value="${jd}">${jd}</option>`;
+                });
+                
+                jdSelect.disabled = false;
+                
+            } catch (error) {
+                console.error('Error loading JDs:', error);
+                jdSelect.innerHTML = '<option value="">Error loading job descriptions</option>';
+            }
+            
+            jdDetails.classList.add('hidden');
+        }
+
+        async function loadJDDetails() {
+            const clientSelect = document.getElementById('existing_client_select');
+            const jdSelect = document.getElementById('jd_select');
+            const jdDetails = document.getElementById('jd_details');
+            const jdReqExp = document.getElementById('jd_req_exp');
+            const jdPrimary = document.getElementById('jd_primary');
+            const jdSecondary = document.getElementById('jd_secondary');
+            const jdEditBtn = document.getElementById('jd_edit_btn');
+            const jdSaveBtn = document.getElementById('jd_save_btn');
+            const jdCancelBtn = document.getElementById('jd_cancel_btn');
+            const analyzeBtn = document.getElementById('analyze_btn');
+
+            const clientName = clientSelect.value;
+            const jdName = jdSelect.value;
+            
+            if (!clientName || !jdName) {
+                jdDetails.classList.add('hidden');
+                return;
+            }
+            
+            try {
+                const res = await authFetch(`${API_BASE_URL}/clients/${encodeURIComponent(clientName)}/jds/${encodeURIComponent(jdName)}`);
+                
+                if (!res.ok) {
+                    jdDetails.classList.add('hidden');
+                    return;
+                }
+                
+                const data = await res.json();
+                jdReqExp.value = data.required_experience || '';
+                jdPrimary.value = (data.primary_skills || []).join(', ');
+                jdSecondary.value = (data.secondary_skills || []).join(', ');
+                
+                // Ensure fields are disabled initially
+                jdReqExp.disabled = true;
+                jdPrimary.disabled = true;
+                jdSecondary.disabled = true;
+                
+                // Show only Edit button initially
+                jdEditBtn.classList.remove('hidden');
+                jdSaveBtn.classList.add('hidden');
+                jdCancelBtn.classList.add('hidden');
+                
+                // Show analyze button
+                analyzeBtn.style.display = 'block';
+                
+                jdDetails.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error loading JD details:', error);
+                alert('Failed to load job description details');
+                jdDetails.classList.add('hidden');
+            }
+        }
+
+        async function loadCompanyData() {
+            try {
+                // Get company information
+                const response = await authFetch(`${API_BASE_URL}/companies`);
+                
+                if (response.ok) {
+                    const companies = await response.json();
+                    companyData = companies.find(c => c.id === userData.company_id);
+                }
+            } catch (error) {
+                console.error("Error loading company data:", error);
+            }
+        }
+
+        async function loadCompanyUsers() {
+            setActiveLink('users');
+            document.getElementById('dataSectionTitle').textContent = 'Company Users';
+            document.getElementById('dataFilterDropdownContainer').style.display = 'block';
+            
+            try {
+                const response = await authFetch(`${API_BASE_URL}/users?company_id=${userData.company_id}`);
+                
+                if (response.ok) {
+                    const users = await response.json();
+                    displayCompanyUsers(users);
+                    updateUserStats(users);
+                }
+            } catch (error) {
+                showMessage("Error loading users", "error");
+            }
+        }
+
+        function updateUserStats(users) {
+            const company_users = users.filter(user => user.role === "user").length;
+            const admins = users.filter(user => user.role === "company_admin").length;
+            
+            document.getElementById("usersCount").textContent = company_users;
+            document.getElementById("adminsCount").textContent = admins;
+        }
+
+        function displayCompanyUsers(users) {
+            const content = document.getElementById("dataContent");
+            if (users.length === 0) {
+                content.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No users found in your company
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            users.forEach(user => {
+                const roleBadge = user.role === "company_admin" ? 
+                    '<span class="badge bg-primary">company_admin</span>' : 
+                    '<span class="badge bg-secondary">user</span>';
+                
+                html += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${roleBadge}</td>
+                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    </tr>
+                `;
+            });
+
+            html += "</tbody></table></div>";
+            content.innerHTML = html;
+        }
+
+        function showCompanyInfo() {
+            setActiveLink('info');
+            document.getElementById('dataSectionTitle').textContent = 'Company Information';
+            document.getElementById('dataFilterDropdownContainer').style.display = 'block';
+            
+            const content = document.getElementById("dataContent");
+            if (companyData) {
+                content.innerHTML = `
+                    <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
+                        <h4 class="text-primary mb-3"><i class="fas fa-building me-2"></i>Company Information</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong> ${companyData.name}</p>
+                                <p><strong>Description:</strong> ${companyData.description || 'No description'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Address:</strong> ${companyData.address || 'No address'}</p>
+                                <p><strong>Created:</strong> ${new Date(companyData.created_at).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Company information not available
+                    </div>
+                `;
+            }
+        }
+
+        // Create a helper function for authenticated requests
+        async function authFetch(url, options = {}) {
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+            const token = localStorage.getItem("userToken");
+            const role = userData.role || userData?.role;
+            const userId = userData.user_id || userData?.user_id || userData.id || userData?.id;
+            const companyId = userData.company_id || userData?.company_id || "";
+            
+            // Set headers
+            options.headers = {
+                ...options.headers,
+                "X-User-Role": role,
+                "X-User-Id": userId,
+                "X-Company-Id": companyId
+            };
+            
+            if (token) {
+                options.headers.Authorization = `Bearer ${token}`;
+            }
+            
+            const response = await fetch(url, options);
+            
+            // Handle unauthorized responses
+            if (response.status === 401) {
+                localStorage.removeItem("userData");
+                localStorage.removeItem("userToken");
+                window.location.href = "login.html";
+                throw new Error("Unauthorized - redirecting to login");
+            }
+            
+            return response;
+        }
+
+        // Analyze resume function
+        async function analyzeResume() {
+            const resumeInput = document.getElementById('resume');
+            const fileError = document.getElementById('file-error');
+            const analyzeBtn = document.getElementById('analyze_btn');
+            const analyzeLoading = document.getElementById('analyzeLoading');
+            
+            // Validate file
+            if (!resumeInput.files.length) { 
+                fileError.textContent = 'Please upload a resume file.';
+                fileError.style.display = 'block';
+                return; 
+            }
+            
+            const file = resumeInput.files[0];
+            const validationResult = validateFile(file);
+            if (!validationResult.isValid) {
+                fileError.textContent = validationResult.message;
+                fileError.style.display = 'block';
+                return;
+            }
+            
+            let jd;
+            const usingExisting = document.querySelector('input[name="client_mode"][value="existing"]').checked;
+            
+            if (usingExisting) {
+                const clientSelect = document.getElementById('existing_client_select');
+                const jdSelect = document.getElementById('jd_select');
+                const jdReqExp = document.getElementById('jd_req_exp');
+                const jdPrimary = document.getElementById('jd_primary');
+                const jdSecondary = document.getElementById('jd_secondary');
+                
+                const name = clientSelect?.value;
+                const jdName = jdSelect?.value;
+                
+                if (!name || name === 'Choose One' || !jdName || jdName === 'Choose One') {
+                    alert('Please select a client and JD.');
+                    return;
+                }
+                
+                jd = {
+                    client_name: name,
+                    jd_title: jdName,
+                    required_experience: jdReqExp?.value.trim() || '',
+                    primary_skills: (jdPrimary?.value || '').split(',').map(s => s.trim()).filter(Boolean),
+                    secondary_skills: (jdSecondary?.value || '').split(',').map(s => s.trim()).filter(Boolean)
+                };
+            } else {
+                const clientName = document.getElementById('client_name')?.value.trim() || '';
+                const jdTitle = document.getElementById('jd_title')?.value.trim() || '';
+                const requiredExp = document.getElementById('required_experience')?.value.trim() || '';
+                const primarySkills = document.getElementById('primary_skills')?.value.trim() || '';
+                const secondarySkills = document.getElementById('secondary_skills')?.value.trim() || '';
+
+                if (!clientName || !jdTitle || !requiredExp || !primarySkills) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                if (!/^\d+\s*\+|\d+\s*-\s*\d+$/.test(requiredExp)) {
+                    alert("Invalid experience format! Use '3-5', '4+' or '5 +'");
+                    return;
+                }
+                
+                jd = {
+                    client_name: clientName,
+                    jd_title: jdTitle,
+                    required_experience: requiredExp,
+                    primary_skills: primarySkills ? primarySkills.split(',').map(s => s.trim()).filter(Boolean) : [],
+                    secondary_skills: secondarySkills ? secondarySkills.split(',').map(s => s.trim()).filter(Boolean) : []
+                };
+            }
+
+            const fd = new FormData();
+            fd.append('resume', resumeInput.files[0]);
+            fd.append('jd_data', JSON.stringify(jd));
+
+            const analysisContainer = document.getElementById('analysis_container');
+            analysisContainer.classList.add('hidden');
+            
+            // Show loading indicator
+            analyzeBtn.disabled = true;
+            analyzeLoading.style.display = 'block';
+
+            try {
+                const resp = await authFetch(`${API_BASE_URL}/analyze`, { method: 'POST', body: fd });
+                if (!resp.ok) {
+                    throw new Error(`Server returned ${resp.status}: ${resp.statusText}`);
+                }
+                
+                const json = await resp.json();
+                renderAnalysis(json);
+                // Reload history after analysis
+                loadAnalysisHistory();
+            } catch (err) {
+                console.error('Analysis error:', err);
+                analysisContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i> 
+                        Error analyzing resume: ${err.message || 'Unknown error'}
+                    </div>
+                `;
+                analysisContainer.classList.remove('hidden');
+            } finally {
+                // Hide loading indicator
+                analyzeBtn.disabled = false;
+                analyzeLoading.style.display = 'none';
+            }
+        }
+
+        // Render analysis results
+        function renderAnalysis(payload) {
+            const analysisContainer = document.getElementById('analysis_container');
+            if (!analysisContainer) return;
+            
+            if (!payload || !payload.analysis) { 
+                analysisContainer.innerHTML = '<div class="alert alert-danger">No analysis returned from server</div>'; 
+                analysisContainer.classList.remove('hidden');
+                return; 
+            }
+            
+            const data = payload.analysis;
+            const score = (data.skill_analysis && data.skill_analysis.match_score) || 0;
+            const candidateName = (data.candidate_info && data.candidate_info.candidate_name) || 'Not specified';
+            const primaryMatched = (data.skill_analysis && data.skill_analysis.matching_skills) || [];
+            const primaryMissing = (data.skill_analysis && data.skill_analysis.missing_primary_skills) || [];
+            const secondaryMissing = (data.skill_analysis && data.skill_analysis.missing_secondary_skills) || [];
+            const positions = (data.experience_analysis && data.experience_analysis.positions) || [];
+            const totalExp = (data.experience_analysis && data.experience_analysis.total_experience) || 'N/A';
+            const expMatch = (data.experience_analysis && data.experience_analysis.experience_match) || false;
+            const missingDates = (data.experience_analysis && data.experience_analysis.positions_with_missing_dates) || 0;
+            const isFresher = (data.experience_analysis && data.experience_analysis.is_fresher) || false;
+            const summary = data.summary || '';
+
+            const rows = positions.map((p, i) => `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><b>${p.company || 'Unknown'}</b><br/>${p.title || 'Unknown'}</td>
+                    <td>${p.duration_missing ? '<span style="color:red;">📅 Dates Missing</span>' : (p.duration || 'N/A')}</td>
+                    <td>${p.duration_missing ? '' : (p.duration_length || 'N/A')}</td>
+                    <td>${p.is_internship ? '🎓 Internship' : '💼 Full-time'}</td>
+                </tr>
+            `).join('');
+
+            analysisContainer.innerHTML = `
+                <div class="analysis-card">
+                    <div class="report-header">
+                        <img src="static/logo1.png" width="90" height="60" />
+                        <div>
+                            <h3>Resume Analysis Report</h3>
+                        </div>
+                    </div>
+
+                    <div class="candidate-name">👤 Candidate Name: ${candidateName}</div>
+
+                    <div class="match-score-box">
+                        <div><strong>Overall Match Score:</strong></div>
+                        <div class="progress-circle" style="background: conic-gradient(#4CAF50 ${score}%, #f0f0f0 ${score}% 100%);">
+                            <div class="progress-circle-inner"><span class="progress-score">${score}%</span></div>
+                        </div>
+                    </div>
+
+                    ${summary ? `<div class="profile-feedback"><strong>📝 Profile Feedback</strong><div class="panel">${summary}</div></div>` : ''}
+
+                    <h4>📅 Experience Analysis</h4>
+                    <div class="metrics">
+                        <div class="metric-card"><div class="metric-title">⏳ Candidate's Experience</div><div class="metric-value">${totalExp}</div></div>
+                        <div class="metric-card ${expMatch ? '' : 'no-match'}"><div class="metric-title">🧐 Experience Match</div><div class="metric-value ${expMatch ? 'success' : 'error'}">${expMatch ? '✅ Match' : '❌ No Match'}</div></div>
+                        <div class="metric-card"><div class="metric-title">Status</div><div class="metric-value">${isFresher ? '👶 Fresher' : (missingDates > 0 ? `⚠️ ${missingDates} positions missing dates` : '✅ Complete dates')}</div></div>
+                    </div>
+
+                    <div class="table">
+                        <table>
+                            <thead>
+                                <tr><th>S.No</th><th>Company & Role</th><th>Start & End Date</th><th>Duration</th><th>Job Type</th></tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+
+                    <h4>💡 Skills Analysis Summary</h4>
+                    <div class="skill-row">
+                        <div class="skill-box">
+                            <h5>Primary Skills (Must Have)</h5>
+                            ${primaryMatched.map(s => `<div class="skill-item skill-matched">✔️ ${s}</div>`).join('')}
+                            ${primaryMissing.map(s => `<div class="skill-item skill-missing-primary">✖️ ${s}</div>`).join('')}
+                        </div>
+                        <div class="skill-box">
+                            <h5>Secondary Skills (Nice to Have)</h5>
+                            ${secondaryMissing.length
+                                ? secondaryMissing.map(s => `<div class="skill-item skill-missing-secondary">⚠️ ${s}</div>`).join('')
+                                : '<div class="skill-item skill-matched">✅ All secondary skills are matched!</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            analysisContainer.classList.remove('hidden');
+        }
+
+        // Load analysis history
+        async function loadAnalysisHistory() {
+            try {
+                const res = await authFetch(`${API_BASE_URL}/history`);
+                if (res.ok) {
+                    analysisHistory = await res.json();
+                    // Update stats
+                    document.getElementById("analysesCount").textContent = analysisHistory.length;
+                    
+                    // Count unique clients
+                    const uniqueClients = new Set(analysisHistory.map(item => item.client_name)).size;
+                    document.getElementById("clientsCount").textContent = uniqueClients;
+                }
+            } catch (error) {
+                console.error('Error loading analysis history:', error);
+            }
+        }
+
+        // History functionality
+        async function loadHistory() {
+            const historySearch = document.getElementById('history_search');
+            const historyTable = document.getElementById('history_table');
+            
+            if (!historyTable) return;
+            
+            historyTable.innerHTML = '<div class="text-center p-4">Loading history...</div>';
+            
+            try {
+                let items = analysisHistory;
+                const q = (historySearch?.value || '').toLowerCase();
+                
+                if (q) {
+                    items = items.filter(x =>
+                        (x.candidate_name || '').toLowerCase().includes(q) ||
+                        (x.candidate_email || '').toLowerCase().includes(q) ||
+                        (x.client_name || '').toLowerCase().includes(q) ||
+                        (x.jd_title || '').toLowerCase().includes(q)
+                    );
+                }
+                
+                items.sort((a,b) => (a.timestamp||'').localeCompare(b.timestamp||'')).reverse();
+
+                if (items.length === 0) {
+                    historyTable.innerHTML = '<div class="text-center p-4">No analysis history found</div>';
+                    return;
+                }
+
+                const rows = items.map((h, idx) => `
+                    <tr>
+                        <td>${idx+1}</td>
+                        <td>${h.candidate_name||'N/A'}</td>
+                        <td>${h.client_name||'N/A'}</td>
+                        <td>${h.jd_title||'N/A'}</td>
+                        <td>${h.required_experience||'N/A'} Years</td>
+                        <td>${h.total_experience||'N/A'}</td>
+                        <td style="text-align: center;">${h.experience_match ? '✅' : '❌'}</td>
+                        <td>${h.filename||'N/A'}</td>
+                        <td>${h.match_score ?? 'N/A'}</td>
+                        <td>${h.candidate_email||'N/A'}</td>
+                        <td>${formatDate(h.timestamp)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="downloadResume('${h.analysis_id}')">
+                                Download
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                historyTable.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Candidate Name</th>
+                                    <th>Client Name</th>
+                                    <th>Job Description</th>
+                                    <th>Required Exp</th>
+                                    <th>Candidate Exp</th>
+                                    <th>Exp Match</th>
+                                    <th>File Name</th>
+                                    <th>Score</th>
+                                    <th>Email</th>
+                                    <th>Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (e) {
+                console.error('Error loading history:', e);
+                historyTable.innerHTML = '<div class="alert alert-danger">Failed to load history</div>';
+            }
+        }
+
+        // Download resume file
+        function getAuthToken() {
+    // Implement based on your auth system
+    return localStorage.getItem('authToken');
+}
+        async function downloadResume(analysisId) {
+            try {
+                const response = await authFetch(`${API_BASE_URL}/download/${analysisId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to download file');
+                }
+                
+                // Get filename from Content-Disposition header
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'resume.pdf';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+                    if (filenameMatch.length > 1) filename = filenameMatch[1];
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Failed to download file');
+            }
+        }
+
+        // Filter history based on search input
+        function filterHistory() {
+            loadHistory();
+        }
+
+        // Format date for display
+        function formatDate(iso) {
+            if (!iso) return 'N/A';
+            try {
+                const d = new Date(iso);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0'); // months are 0-based
+                const year = d.getFullYear();
+                return `${day}-${month}-${year}`;
+            } catch {
+                return iso;
+            }
+        }
+
+
+        function showMessage(message, type) {
+            // Create a temporary alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} fixed-top mx-auto mt-3`;
+            alertDiv.style.maxWidth = '500px';
+            alertDiv.style.zIndex = '1100';
+            alertDiv.style.animation = 'fadeIn 0.3s ease-out';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(alertDiv);
+                }, 300);
+            }, 5000);
+        }
+
+        function logout() {
+            // Reset active link to dashboard for next login
+            localStorage.setItem('activeLink', 'dashboard');
+            localStorage.removeItem("userData");
+            localStorage.removeItem("userToken");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

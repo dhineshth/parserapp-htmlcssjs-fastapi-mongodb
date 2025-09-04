@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #sidebar .sidebar-header {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        #sidebar .sidebar-header img {
+            height: 40px;
+            margin-bottom: 10px;
+        }
+        
+        #sidebar .sidebar-header h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        
+        #sidebar .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        #sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            margin: 0.25rem 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        #sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        #sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        #sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        #sidebar .nav-link .link-text {
+            transition: opacity 0.3s;
+        }
+        
+        /* Main Content Styles */
+        #content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+        
+        .card-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .card-success {
+            background: linear-gradient(135deg, #2bde8c 0%, #1eae6e 100%);
+            color: white;
+        }
+        
+        .card-warning {
+            background: linear-gradient(135deg, #ffb347 0%, #ff8c00 100%);
+            color: white;
+        }
+        
+        .card-danger {
+            background: linear-gradient(135deg, #ff5e62 0%, #ff2d55 100%);
+            color: white;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Data Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            padding: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table tr:hover td {
+            background-color: #f8f9fa;
+        }
+        
+        /* Badges */
+        .badge-admin {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .badge-user {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            #sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            #sidebar .link-text {
+                opacity: 0;
+                display: none;
+            }
+            
+            #sidebar .sidebar-header h3 {
+                display: none;
+            }
+            
+            #sidebar .sidebar-header img {
+                margin-bottom: 0;
+            }
+            
+            #content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            #content {
+                margin-left: 0;
+            }
+            
+            .top-navbar {
+                padding: 0.5rem;
+            }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <img src="logo.png" alt="Logo" style="width: 70px; height: 70px;">
+            <h3>Super Admin</h3>
+        </div>
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="dashboard" onclick="showDashboard()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="companies" onclick="loadCompanies()">
+                        <i class="fas fa-building"></i>
+                        <span class="link-text">Companies</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="users" onclick="loadUsers()">
+                        <i class="fas fa-users"></i>
+                        <span class="link-text">Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="add-company" onclick="openCompanyModal()">
+                        <i class="fas fa-plus-circle"></i>
+                        <span class="link-text">Add Company</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="add-user" onclick="openUserModal()">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="link-text">Add User</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="link-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar navbar navbar-expand navbar-light bg-white">
+            <div class="container-fluid">
+                <button class="btn btn-link d-md-none" type="button" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="user-info">
+                        <div class="avatar" id="userInitial">A</div>
+                        <div>
+                            <div class="fw-bold" id="userName">Admin</div>
+                            <small class="text-muted">Super Admin</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <div class="container-fluid py-4">
+            <!-- Welcome Section -->
+            <div class="row mb-4 animate-fade">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body text-center py-4">
+                            <h2 class="card-title">Super Admin Dashboard</h2>
+                            <p class="card-text text-muted">Manage companies, users, and operations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Alert -->
+            <!-- Message Alert -->
+            <div id="message" class="row mb-4" style="display: none;">
+                <div class="col-12">
+                    <div class="alert" id="alertMessage" role="alert">
+                        <!-- Message content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4 animate-fade">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card dashboard-card card-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="card-title mb-1" id="companiesCount">0</h3>
+                                    <p class="card-text mb-0">Total Companies</p>
+                                </div>
+                                <i class="fas fa-building card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card dashboard-card card-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="card-title mb-1" id="usersCount">0</h3>
+                                    <p class="card-text mb-0">Total Users</p>
+                                </div>
+                                <i class="fas fa-users card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-md-6 col-lg-3">
+                    <div class="card dashboard-card card-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="card-title mb-1">12</h3>
+                                    <p class="card-text mb-0">Active Sessions</p>
+                                </div>
+                                <i class="fas fa-user-clock card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card dashboard-card card-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3 class="card-title mb-1">3</h3>
+                                    <p class="card-text mb-0">Pending Actions</p>
+                                </div>
+                                <i class="fas fa-exclamation-circle card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+
+            <!-- Quick Actions
+            <div class="row mb-4 animate-fade">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Quick Actions</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary action-btn" onclick="openCompanyModal()">
+                                    <i class="fas fa-plus-circle"></i> Create Company
+                                </button>
+                                <button class="btn btn-success action-btn" onclick="openUserModal()">
+                                    <i class="fas fa-user-plus"></i> Create User
+                                </button>
+                                <button class="btn btn-info action-btn" onclick="loadCompanies()">
+                                    <i class="fas fa-building"></i> View Companies
+                                </button>
+                                <button class="btn btn-secondary action-btn" onclick="loadUsers()">
+                                    <i class="fas fa-users"></i> View Users
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Data Section -->
+            <div class="row animate-fade">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Recent Data</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dataFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-filter"></i> Filter
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dataFilterDropdown">
+                                        <li><a class="dropdown-item" href="#" onclick="loadCompanies()">Companies</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="loadUsers()">Users</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="dataContent">
+                                <p class="text-muted text-center py-4">Select an option from the sidebar or quick actions to view data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Modal -->
+    <div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="companyModalLabel">Create New Company</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="companyForm" novalidate>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="companyName" class="form-label">Company Name *</label>
+                                <input type="text" class="form-control" id="companyName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="companyAddress" class="form-label">Address *</label>
+                                <input type="text" class="form-control" id="companyAddress" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="companyDescription" class="form-label">Description *</label>
+                            <textarea class="form-control" id="companyDescription" rows="3" required></textarea>
+                        </div>
+                        <hr>
+                        <h6 class="mb-3">Company Admin Details</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="companyAdminEmail" class="form-label">Admin Email *</label>
+                                <input type="email" class="form-control" id="companyAdminEmail" placeholder="e.g., admin@company.com" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="companyAdminPassword" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="companyAdminPassword" placeholder="At least 6 characters" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="companyAdminPasswordConfirm" class="form-label">Confirm Password *</label>
+                                <input type="password" class="form-control" id="companyAdminPasswordConfirm" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Company</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="userModalLabel">Create New User</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="userForm" novalidate>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="newUserName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="newUserName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="userEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPassword" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="userPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userCompany" class="form-label">Company *</label>
+                            <select class="form-select" id="userCompany" required>
+                                <option value="">Select Company</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" onclick="submitNewUser()">Create User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Company Modal -->
+    <div class="modal fade" id="editCompanyModal" tabindex="-1" aria-labelledby="editCompanyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="editCompanyModalLabel">Edit Company</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editCompanyForm" novalidate>
+                    <input type="hidden" id="editCompanyId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editCompanyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="editCompanyName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCompanyDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editCompanyDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCompanyAddress" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="editCompanyAddress">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editUserForm" novalidate>
+                    <input type="hidden" id="editUserId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editUserName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editUserName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editUserEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserPassword" class="form-label">Password (leave blank to keep)</label>
+                            <input type="password" class="form-control" id="editUserPassword">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserRole" class="form-label">Role</label>
+                            <select class="form-select" id="editUserRole">
+                                <option value="">Choose One</option>
+                                <option value="company_admin">Company Admin</option>
+                                <option value="user">Regular User</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserCompany" class="form-label">Company</label>
+                            <select class="form-select" id="editUserCompany">
+                                <option value="">Choose One</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Your Existing Script (unchanged) -->
+    <script>
+        // Your existing JavaScript code remains exactly the same
+        // Only the HTML and CSS have been updated
+        let userData = null;
+        let companies = [];
+        // Set active nav link based on current page
+        function setActiveNavLink() {
+            // Get current page from localStorage or default to dashboard
+            const currentPage = localStorage.getItem('currentPage') || 'dashboard';
+            
+            // Remove active class from all links
+            document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Add active class to current page link
+            const activeLink = document.querySelector(`#sidebar .nav-link[data-page="${currentPage}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+
+        // Update active nav link when clicking a menu item
+        function updateActiveNavLink(page) {
+            localStorage.setItem('currentPage', page);
+            setActiveNavLink();
+        }
+
+        // Check authentication on page load
+        window.onload = function() {
+            const storedUserData = localStorage.getItem("userData");
+            if (!storedUserData) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            userData = JSON.parse(storedUserData);
+            if (userData.role !== "super_admin") {
+                window.location.href = "index.html";
+                return;
+            }
+
+            document.getElementById("userName").textContent = userData.name;
+            document.getElementById("userInitial").textContent = userData.name.charAt(0).toUpperCase();
+            loadDashboardData();
+            loadCompaniesForSelect();
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            if (sidebar.style.width === '0px' || sidebar.style.width === '') {
+                sidebar.style.width = 'var(--sidebar-width)';
+                content.style.marginLeft = 'var(--sidebar-width)';
+            } else {
+                sidebar.style.width = '0';
+                content.style.marginLeft = '0';
+            }
+        }
+
+        function showDashboard() {
+            updateActiveNavLink('dashboard');
+            document.getElementById('dataContent').innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-tachometer-alt fa-3x text-muted mb-3"></i>
+                    <h5>Dashboard Overview</h5>
+                    <p class="text-muted">Select an option from the sidebar to view specific data</p>
+                </div>
+            `;
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/dashboard", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("userToken")}`,
+                        "X-User-Role": "super_admin"
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById("companiesCount").textContent = data.companies_count;
+                    document.getElementById("usersCount").textContent = data.users_count;
+                }
+            } catch (error) {
+                console.error("Error loading dashboard data:", error);
+            }
+        }
+
+        async function loadCompaniesForSelect() {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/companies", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("userToken")}`,
+                        "X-User-Role": "super_admin"
+                    }
+                });
+                
+                if (response.ok) {
+                    companies = await response.json();
+                    const select = document.getElementById("userCompany");
+                    select.innerHTML = '<option value="">Select Company</option>';
+                    
+                    companies.forEach(company => {
+                        const option = document.createElement("option");
+                        option.value = company.id;
+                        option.textContent = company.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading companies:", error);
+            }
+        }
+
+        async function loadCompanies() {
+            updateActiveNavLink('companies');
+            try {
+                const response = await fetch("http://127.0.0.1:8000/companies", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("userToken")}`,
+                        "X-User-Role": "super_admin"
+                    }
+                });
+                
+                if (response.ok) {
+                    companies = await response.json();
+                    displayCompanies(companies);
+                }
+            } catch (error) {
+                showMessage("Error loading companies", "error");
+            }
+        }
+
+        async function loadUsers() {
+            updateActiveNavLink('users');
+            try {
+                const response = await fetch("http://127.0.0.1:8000/users", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("userToken")}`,
+                        "X-User-Role": "super_admin"
+                    }
+                });
+                
+                if (response.ok) {
+                    const users = await response.json();
+                    displayUsers(users);
+                }
+            } catch (error) {
+                showMessage("Error loading users", "error");
+            }
+        }
+
+        function displayCompanies(companies) {
+            const content = document.getElementById("dataContent");
+            if (companies.length === 0) {
+                content.innerHTML = `<p class="text-muted text-center py-4">No companies found</p>`;
+                return;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table data-table">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Description</th>
+                                <th>Address</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            companies.forEach(company => {
+                html += `
+                    <tr>
+                        <td>${company.name}</td>
+                        <td>${company.description || '-'}</td>
+                        <td>${company.address || '-'}</td>
+                        <td>${new Date(company.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick='openEditCompanyModal(${JSON.stringify(company)})'>
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick='confirmDeleteCompany("${company.id}")'>
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += "</tbody></table></div>";
+            content.innerHTML = html;
+        }
+
+        function displayUsers(users) {
+            const content = document.getElementById("dataContent");
+            if (users.length === 0) {
+                content.innerHTML = `<p class="text-muted text-center py-4">No users found</p>`;
+                return;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Company</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            users.forEach(user => {
+                const company = companies.find(c => c.id === user.company_id);
+                const badgeClass = user.role === 'company_admin' ? 'badge-admin' : 'badge-user';
+                html += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td><span class="badge ${badgeClass}">${user.role}</span></td>
+                        <td>${company ? company.name : 'Unknown'}</td>
+                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick='openEditUserModal(${JSON.stringify(user)})'>
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick='confirmDeleteUser("${user.id}")'>
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += "</tbody></table></div>";
+            content.innerHTML = html;
+        }
+
+        // Modal functions
+        function openCompanyModal() {
+            updateActiveNavLink('add-company');
+            const modal = new bootstrap.Modal(document.getElementById('companyModal'));
+            modal.show();
+        }
+
+        function closeCompanyModal() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('companyModal'));
+            modal.hide();
+            document.getElementById("companyForm").reset();
+        }
+
+        function openUserModal() {
+            updateActiveNavLink('add-user');
+            // Ensure companies are loaded
+            if (!companies || companies.length === 0) {
+                loadCompaniesForSelect();
+                showMessage("Loading companies. Please try again in a moment.", "error");
+                return;
+            }
+            const companySelect = document.getElementById("userCompany");
+            // Auto-select the first company if none selected
+            if (companySelect && (!companySelect.value || companySelect.value === "")) {
+                companySelect.value = companies[0]?.id || "";
+            }
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
+        }
+
+        function closeUserModal() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+            modal.hide();
+            document.getElementById("userForm").reset();
+        }
+
+        // Form submissions
+        document.getElementById("companyForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            const name = (document.getElementById("companyName").value || "").trim();
+            const description = (document.getElementById("companyDescription").value || "").trim();
+            const address = (document.getElementById("companyAddress").value || "").trim();
+            const admin_email = (document.getElementById("companyAdminEmail").value || "").trim();
+            const admin_password = (document.getElementById("companyAdminPassword").value || "").trim();
+            const admin_password_confirm = (document.getElementById("companyAdminPasswordConfirm").value || "").trim();
+
+            const missing = [];
+            if (!name) missing.push("company name");
+            if (!description) missing.push("description");
+            if (!address) missing.push("address");
+            if (!admin_email) missing.push("admin email");
+            if (!admin_password) missing.push("admin password");
+            if (!admin_password_confirm) missing.push("confirm password");
+            if (missing.length) {
+                showMessage("Please fill required fields: " + missing.join(", "), "error");
+                return;
+            }
+            if (admin_password.length < 6) {
+                showMessage("Admin password must be at least 6 characters.", "error");
+                return;
+            }
+            if (admin_password !== admin_password_confirm) {
+                showMessage("Passwords do not match.", "error");
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(admin_email)) {
+                showMessage("Please enter a valid admin email.", "error");
+                return;
+            }
+
+            // Client-side duplicate check
+            try {
+                const listRes = await fetch("http://127.0.0.1:8000/companies", {
+                    headers: { "X-User-Role": "super_admin" }
+                });
+                if (listRes.ok) {
+                    const list = await listRes.json();
+                    const nameExists = (list || []).some(c => (c.name || '').trim().toLowerCase() === name.toLowerCase());
+                    if (nameExists) {
+                        showMessage("Company name already exists.", "error");
+                        return;
+                    }
+                }
+            } catch {}
+
+            // Admin email duplicate check (basic, server still authoritative)
+            try {
+                // Try search via users endpoint; if not filtered, just proceed to server-side check
+                const usersRes = await fetch("http://127.0.0.1:8000/users", {
+                    headers: { "X-User-Role": "super_admin" }
+                });
+                if (usersRes.ok) {
+                    const users = await usersRes.json();
+                    const emailExists = (users || []).some(u => (u.email || '').trim().toLowerCase() === admin_email.toLowerCase());
+                    if (emailExists) {
+                        showMessage("Admin email already exists.", "error");
+                        return;
+                    }
+                }
+            } catch {}
+
+            const companyData = { name, description, address, admin_email, admin_password };
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/companies", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("userToken")}`,
+                        "X-User-Role": "super_admin"
+                    },
+                    body: JSON.stringify(companyData)
+                });
+
+                if (response.ok) {
+                    showMessage("Company created successfully!", "success");
+                    closeCompanyModal();
+                    loadDashboardData();
+                    loadCompaniesForSelect();
+                } else {
+                    const errorText = await response.text();
+                    showMessage(errorText || "Failed to create company", "error");
+                }
+            } catch (error) {
+                showMessage("Error creating company", "error");
+            }
+        });
+
+        async function submitNewUser() {
+            const nameEl = document.getElementById("newUserName");
+            const emailEl = document.getElementById("userEmail");
+            const pwdEl = document.getElementById("userPassword");
+            const companyEl = document.getElementById("userCompany");
+
+            if (!nameEl || !emailEl || !pwdEl || !companyEl) {
+                console.error("One or more form elements were not found", { nameEl, emailEl, pwdEl, companyEl });
+                showMessage("Form is not ready. Please refresh the page and try again.", "error");
+                return;
+            }
+
+            const name = (nameEl.value ?? "").trim();
+            const email = (emailEl.value ?? "").trim();
+            const password = (pwdEl.value ?? "").trim();
+            const role = "user"; // force regular user role
+            // Prefer selected option value in case .value is unreliable in some browsers
+            const company_id = ((companyEl.options && companyEl.selectedIndex >= 0)
+                ? (companyEl.options[companyEl.selectedIndex].value || "")
+                : (companyEl.value || "")).trim();
+
+            const missing = [];
+            if (!name) missing.push("name");
+            if (!email) missing.push("email");
+            if (!password) missing.push("password");
+            if (!role) missing.push("role");
+            if (!company_id) missing.push("company");
+
+            if (!companies || companies.length === 0) {
+                showMessage("No companies available. Please create a company first.", "error");
+                return;
+            }
+            if (missing.length > 0) {
+                console.warn("Missing fields:", { name, email, password: password ? "***" : "", role, company_id });
+                showMessage("Please fill all fields and select a company (missing: " + missing.join(", ") + ").", "error");
+                return;
+            }
+            if (role !== "company_admin" && role !== "user") {
+                showMessage("Role must be 'company_admin' or 'user'.", "error");
+                return;
+            }
+            const uuidRegex = /^[0-9a-fA-F-]{36}$/;
+            if (!uuidRegex.test(company_id)) {
+                showMessage("Please select a valid company.", "error");
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMessage("Please enter a valid email address.", "error");
+                emailEl.focus();
+                return;
+            }
+            if (password.length < 6) {
+                showMessage("Password must be at least 6 characters.", "error");
+                pwdEl.focus();
+                return;
+            }
+
+            const payload = { name, email, password, role, company_id };
+            console.log("Submitting /users payload:", payload);
+
+            const res = await fetch("http://127.0.0.1:8000/users", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                "X-User-Role": "super_admin"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showMessage("User created successfully!", "success");
+                closeUserModal();
+                loadDashboardData();
+                return;
+            }
+
+            let msg = `Failed to create user (status ${res.status})`;
+            try {
+                const bodyText = await res.text();
+                try {
+                const body = JSON.parse(bodyText);
+                if (Array.isArray(body.detail)) {
+                    msg = "Validation errors:\n" + body.detail.map(e => `${e.loc?.join(".")}: ${e.msg}`).join("\n");
+                } else if (body.detail) {
+                    msg = body.detail;
+                } else {
+                    msg = bodyText || msg;
+                }
+                } catch {
+                msg = bodyText || msg;
+                }
+            } catch {}
+            console.error("/users error:", msg);
+            showMessage(msg, "error");
+            }
+
+        // Populate edit company modal
+        function openEditCompanyModal(company) {
+            document.getElementById("editCompanyId").value = company.id;
+            document.getElementById("editCompanyName").value = company.name || "";
+            document.getElementById("editCompanyDescription").value = company.description || "";
+            document.getElementById("editCompanyAddress").value = company.address || "";
+            const modal = new bootstrap.Modal(document.getElementById('editCompanyModal'));
+            modal.show();
+        }
+        function closeEditCompanyModal() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editCompanyModal'));
+            modal.hide();
+            document.getElementById("editCompanyForm").reset();
+        }
+
+        // Populate edit user modal
+        function openEditUserModal(user) {
+            document.getElementById("editUserId").value = user.id;
+            document.getElementById("editUserName").value = user.name || "";
+            document.getElementById("editUserEmail").value = user.email || "";
+            document.getElementById("editUserPassword").value = "";
+            document.getElementById("editUserRole").value = user.role || "";
+
+            const companySelect = document.getElementById("editUserCompany");
+            companySelect.innerHTML = '<option value="">Choose One</option>';
+            companies.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.id; opt.textContent = c.name;
+                companySelect.appendChild(opt);
+            });
+            if (user.company_id) {
+                companySelect.value = user.company_id;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+        }
+        function closeEditUserModal() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+            modal.hide();
+            document.getElementById("editUserForm").reset();
+        }
+
+        // Save company edits
+        document.getElementById("editCompanyForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const id = document.getElementById("editCompanyId").value;
+            const payload = {};
+            const n = document.getElementById("editCompanyName").value.trim();
+            const d = document.getElementById("editCompanyDescription").value.trim();
+            const a = document.getElementById("editCompanyAddress").value.trim();
+            if (n) payload.name = n;
+            if (d) payload.description = d;
+            if (a) payload.address = a;
+            if (Object.keys(payload).length === 0) {
+                showMessage("Nothing to update", "error");
+                return;
+            }
+            const res = await fetch(`http://127.0.0.1:8000/companies/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-Role": "super_admin"
+                },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                showMessage("Company updated", "success");
+                closeEditCompanyModal();
+                loadCompanies();
+                loadCompaniesForSelect();
+            } else {
+                const t = await res.text();
+                showMessage(t || "Failed to update company", "error");
+            }
+        });
+
+        // Save user edits
+        document.getElementById("editUserForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const id = document.getElementById("editUserId").value;
+            const payload = {};
+            const n = document.getElementById("editUserName").value.trim();
+            const em = document.getElementById("editUserEmail").value.trim();
+            const pw = document.getElementById("editUserPassword").value.trim();
+            const rl = document.getElementById("editUserRole").value.trim();
+            const co = document.getElementById("editUserCompany").value.trim();
+            if (n) payload.name = n;
+            if (em) payload.email = em;
+            if (pw) payload.password = pw;
+            if (rl) payload.role = rl;
+            if (co) payload.company_id = co;
+            if (Object.keys(payload).length === 0) {
+                showMessage("Nothing to update", "error");
+                return;
+            }
+            const res = await fetch(`http://127.0.0.1:8000/users/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-Role": "super_admin"
+                },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                showMessage("User updated", "success");
+                closeEditUserModal();
+                loadUsers();
+            } else {
+                const t = await res.text();
+                showMessage(t || "Failed to update user", "error");
+            }
+        });
+
+        // Deletes
+        async function confirmDeleteCompany(id) {
+            if (!confirm("Delete this company? This cannot be undone.")) return;
+            const res = await fetch(`http://127.0.0.1:8000/companies/${id}`, {
+                method: "DELETE",
+                headers: { "X-User-Role": "super_admin" }
+            });
+            if (res.ok) {
+                showMessage("Company deleted", "success");
+                loadCompanies();
+                loadCompaniesForSelect();
+            } else {
+                const t = await res.text();
+                showMessage(t || "Failed to delete company", "error");
+            }
+        }
+        async function confirmDeleteUser(id) {
+            if (!confirm("Delete this user? This cannot be undone.")) return;
+            const res = await fetch(`http://127.0.0.1:8000/users/${id}`, {
+                method: "DELETE",
+                headers: { "X-User-Role": "super_admin" }
+            });
+            if (res.ok) {
+                showMessage("User deleted", "success");
+                loadUsers();
+            } else {
+                const t = await res.text();
+                showMessage(t || "Failed to delete user", "error");
+            }
+        }
+
+        window.addEventListener("error", function(e) {
+            console.error("JS Error:", e.message);
+            showMessage("A script error occurred. Check console for details.", "error");
+        });
+
+        function showMessage(message, type) {
+            const alertBox = document.createElement('div');
+            alertBox.style.position = 'fixed';
+            alertBox.style.top = '20px';
+            alertBox.style.right = '20px';
+            alertBox.style.padding = '15px';
+            alertBox.style.borderRadius = '5px';
+            alertBox.style.color = 'white';
+            alertBox.style.zIndex = '9999';
+            alertBox.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            alertBox.style.animation = 'fadeIn 0.3s ease-out';
+            
+            if (type === "error") {
+                alertBox.style.backgroundColor = '#dc3545'; // Red for errors
+            } else {
+                alertBox.style.backgroundColor = '#28a745'; // Green for success
+            }
+            
+            alertBox.textContent = type === "error" ? `Error: ${message}` : message;
+            document.body.appendChild(alertBox);
+            
+            // Auto-close after 2 seconds
+            setTimeout(() => {
+                alertBox.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(alertBox);
+                }, 300);
+            }, 2000);
+        }
+
+        // Add these CSS animations to your style section
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function dismissMessage() {
+            const messageDiv = document.getElementById("message");
+            messageDiv.style.display = "none";
+        }
+
+        function logout() {
+            localStorage.removeItem('currentPage');
+            localStorage.removeItem("userData");
+            localStorage.removeItem("userToken");
+            window.location.href = "index.html";
+        }
+        // Call this when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveNavLink();
+            
+            // Also set active state when clicking links directly
+            document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    if (page) {
+                        updateActiveNavLink(page);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

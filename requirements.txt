@@ -1,0 +1,6 @@
+fastapi==0.95.2
+uvicorn==0.24.0
+python-dotenv==1.0.0
+bcrypt==4.1.2
+pydantic==1.10.13
+pymongo==4.8.0

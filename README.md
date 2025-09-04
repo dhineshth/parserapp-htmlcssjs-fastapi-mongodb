@@ -1,0 +1,1 @@
+This is resume parser app using fastapi, mongodb and html, css, js
